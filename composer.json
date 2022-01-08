@@ -1,5 +1,5 @@
 {
-    "name": "bologer/wordpress-hook-parser",
+    "name": "next-press/wordpress-hook-parser",
     "description": "Helps to parse WordPress hooks & generate automatic Markdown documentation for them.",
     "type": "library",
     "authors": [
