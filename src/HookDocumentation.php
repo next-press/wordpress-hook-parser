@@ -27,7 +27,7 @@ class HookDocumentation {
 	/**
 	 * @var string Generated content of markdown document.
 	 */
-	private $_markdownContent = '';
+	protected $_markdownContent = '';
 
 	/**
 	 * HookDocumentation constructor.
