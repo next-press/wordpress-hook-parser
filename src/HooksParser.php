@@ -75,11 +75,49 @@ class HooksParser {
 
 		$parsedFiles = \WP_Parser\parse_files( $filePaths, $this->scanDirectory );
 
-		foreach ( $parsedFiles as $parsedFile ) {
+		foreach ($parsedFiles as $parsedFile) {
 
-			if ( isset( $parsedFile['hooks'] ) ) {
+			$deprecated_file = false;
 
-				foreach ( $parsedFile['hooks'] as $hook ) {
+			if (isset($file['uses']['functions'])) {
+
+				$first_function = $file['uses']['functions'][0];
+
+				// If the first function in this file is _deprecated_function
+				if ('_deprecated_file' === $first_function['name']) {
+
+					// Set the deprecated flag to the version number
+					$deprecated_file = $first_function['deprecation_version'];
+
+				} // end if;
+
+			} // end if;
+
+			foreach ($parsedFile['classes'] as $class) {
+
+				if (isset($class['methods']) && !empty($class['methods'])) {
+
+					foreach ($class['methods'] as $method) {
+
+						if (isset($method['hooks']) && !empty($method['hooks'])) {
+
+							$parsedFile['hooks'] = array_merge(
+								(array) $parsedFile['hooks'],
+								$method['hooks']
+							);
+
+						} // end if;
+
+					} // end if;
+
+				} // end if;
+
+			}
+
+			if (isset($parsedFile['hooks'])) {
+
+				foreach ($parsedFile['hooks'] as $hook) {
+
 					$hookDto = new HookDto();
 
 					$hookDto->name      = $hook['name'];
@@ -99,9 +137,12 @@ class HooksParser {
 					foreach ( $tags as $tag ) {
 						$tagDto               = new HookTagDto();
 						$tagDto->name         = $tag['name'];
+						$tagDto->description  = $tag['description'];
+						$tagDto->version      = $tag['version'];
 						$tagDto->content      = $tag['content'];
 						$tagDto->types        = $tag['types'] ?? [];
 						$tagDto->variable     = $tag['variable'] ?? null;
+						$tagDto->refers       = $tag['refers'] ?? null;
 						$hookDocBlock->tags[] = $tagDto;
 					}
 
